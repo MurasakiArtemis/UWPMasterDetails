@@ -1,0 +1,69 @@
+﻿<Page
+    x:Class="VisualTemplate.View.MasterView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VisualTemplate.View"
+    xmlns:converters="using:VisualTemplate.View.Converters"
+    xmlns:vm="using:VisualTemplate.ViewModel"
+    xmlns:model="using:VisualTemplate.Model"
+    xmlns:wrappers="using:VisualTemplate.Model.Wrappers"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <vm:MasterVM x:Key="MasterVM" x:Name="MasterVM"/>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStates">
+                <VisualState x:Name="StackedLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="DetailsFrame.Visibility" Value="Collapsed"/>
+                        <Setter Target="MasterColumn.Width" Value="*"/>
+                        <Setter Target="DetailsColumn.Width" Value="0"/>
+                        <Setter Target="MasterList.Margin" Value="4,0,4,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="SideBySideLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="720"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <ProgressBar IsIndeterminate="True" Visibility="{x:Bind MasterVM.IsBusy, Converter={StaticResource BooleanVisibilityConverter}, Mode=OneWay}"/>
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="An error occurred, Check your internet configuration and try again later" Visibility="{x:Bind MasterVM.IsError, Converter={StaticResource BooleanVisibilityConverter}, Mode=OneWay}"/>
+        <Grid Visibility="{x:Bind MasterVM.IsBusy, Converter={StaticResource BooleanVisibilityConverter}, ConverterParameter=Reverse, Mode=OneWay}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="MasterColumn" Width="Auto"/>
+                <ColumnDefinition x:Name="DetailsColumn" Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ListView x:Name="MasterList" Grid.Column="0" ShowsScrollingPlaceholders="True" ItemClick="ListView_ItemClick" ItemsSource="{x:Bind MasterVM.MasterList, Mode=OneWay}" IsItemClickEnabled="True" HorizontalAlignment="Stretch" Visibility="{x:Bind MasterVM.IsError, Converter={StaticResource BooleanVisibilityConverter}, ConverterParameter=Reverse, Mode=OneWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="model:MasterModel">
+                        <Border BorderThickness="{StaticResource InternalMargin}" Margin="{StaticResource InternalMargin}" CornerRadius="8" Background="Transparent">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="Transparent">
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Frame x:Name="DetailsFrame" Grid.Column="1" Visibility="{x:Bind MasterVM.IsError, Converter={StaticResource BooleanVisibilityConverter}, ConverterParameter=Reverse, Mode=OneWay}">
+                <TextBlock Text="Select an option from the menu" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Frame>
+        </Grid>
+    </Grid>
+</Page>
